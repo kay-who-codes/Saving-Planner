@@ -157,14 +157,15 @@
         }
 
         .main-result {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 1.5rem;
-            padding: 1rem;
+            padding: 1.2rem;
             background: rgba(76, 175, 80, 0.1);
             border-radius: var(--border-radius);
             border-left: 4px solid var(--primary-accent);
             color: var(--text-white);
-            line-height: 1.6;
+            line-height: 1.7;
+            white-space: pre-line;
         }
 
         .scenarios-title {
@@ -425,8 +426,21 @@
             const durationText = formatDuration(monthsNeeded);
             const targetDate = formatDate(monthsNeeded);
             
-            // Main result
-            const mainResult = `It'll take you ${durationText} to save enough money to buy this ${formatCurrency(cost)} item on ${targetDate}.`;
+            // Calculate savings during user's specified duration
+            const userDurationMonths = parseNaturalDuration(durationInput);
+            const totalSavedInDuration = monthlyAmount * userDurationMonths;
+            const discrepancy = totalSavedInDuration - cost;
+            
+            // Main result with additional info
+            let mainResult = `It'll take you ${durationText} to save enough money to buy this ${formatCurrency(cost)} item on ${targetDate}.\n\n`;
+            mainResult += `After your specified duration of ${formatDuration(userDurationMonths)}, you'll have saved ${formatCurrency(totalSavedInDuration)}. `;
+            
+            if (discrepancy >= 0) {
+                mainResult += `That's ${formatCurrency(discrepancy)} more than you need - you could buy it earlier!`;
+            } else {
+                mainResult += `You'll still need ${formatCurrency(Math.abs(discrepancy))} more to reach your goal.`;
+            }
+            
             document.getElementById('mainResult').textContent = mainResult;
             
             // Scenarios
