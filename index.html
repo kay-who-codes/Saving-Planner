@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐖 Saving Planner</title>
+    <style>
+        :root {
+            --bg-dark: #131313;
+            --text-light: #E0E0E0;
+            --text-white: #FFFFFF;
+            --primary-accent: #4caf50;
+            --secondary-accent: #ff4081;
+            --card-bg: #1e1e1e;
+            --input-bg: #2a2a2a;
+            --border-color: #333;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.4);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 64, 129, 0.1) 0%, transparent 50%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        h1 {
+            color: var(--text-white);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-white);
+            font-size: 1rem;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            background: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            color: var(--text-white);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            min-height: 48px;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            transform: translateY(-1px);
+        }
+
+        input[type="number"]:hover, input[type="text"]:hover {
+            border-color: var(--primary-accent);
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input::before {
+            content: '£';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-accent);
+            font-weight: bold;
+            font-size: 1.1rem;
+            z-index: 1;
+        }
+
+        .currency-input input {
+            padding-left: 2.5rem;
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(255, 64, 129, 0.05));
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .results-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .main-result {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-accent);
+            color: var(--text-white);
+            line-height: 1.6;
+        }
+
+        .scenarios-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-white);
+        }
+
+        .scenario {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: var(--transition);
+            flex-wrap: wrap;
+        }
+
+        .scenario:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .scenario-label {
+            font-weight: 500;
+            color: var(--text-white);
+            min-width: 150px;
+        }
+
+        .scenario-value {
+            color: var(--primary-accent);
+            font-weight: 600;
+            text-align: right;
+            flex: 1;
+        }
+
+        .positive-scenario {
+            border-left: 3px solid var(--primary-accent);
+        }
+
+        .negative-scenario {
+            border-left: 3px solid var(--secondary-accent);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            input[type="number"], input[type="text"] {
+                font-size: 1rem;
+                padding: 0.875rem;
+            }
+
+            .currency-input input {
+                padding-left: 2.25rem;
+            }
+
+            .main-result {
+                font-size: 1.1rem;
+            }
+
+            .scenario {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .scenario-label {
+                min-width: auto;
+            }
+
+            .scenario-value {
+                text-align: left;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .input-group {
+                margin-bottom: 1rem;
+            }
+
+            .results-section {
+                padding: 1rem;
+            }
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Loading animation for inputs */
+        .input-loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .input-loading.loading::after {
+            left: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Saving Planner</h1>
+            <p class="subtitle">Plan your big purchase with smart saving strategies</p>
+            
+            <section class="form-section">
+                <div class="input-group">
+                    <label for="cost">Cost of Purchase</label>
+                    <div class="currency-input">
+                        <input type="number" id="cost" value="350" min="1" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="duration">Duration of Saving</label>
+                    <input type="text" id="duration" value="6 months" placeholder="e.g., 6 months, 1 year, 24 weeks">
+                </div>
+                
+                <div class="input-group">
+                    <label for="monthlyAmount">Monthly Saving Amount</label>
+                    <div class="currency-input">
+                        <input type="number" id="monthlyAmount" value="20" min="0.01" step="0.01">
+                    </div>
+                </div>
+            </section>
+            
+            <section class="results-section" id="results">
+                <div class="main-result" id="mainResult"></div>
+                <div class="scenarios-title">Here's how long it would take if you saved a bit more/less:</div>
+                <div id="scenarios"></div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Utility functions
+        function parseNaturalDuration(input) {
+            const str = input.toLowerCase().trim();
+            let months = 0;
+            
+            // Extract numbers and units
+            const yearMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:years?|yrs?)/);
+            const monthMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:months?|mos?)/);
+            const weekMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:weeks?|wks?)/);
+            const dayMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:days?)/);
+            
+            if (yearMatch) months += parseFloat(yearMatch[1]) * 12;
+            if (monthMatch) months += parseFloat(monthMatch[1]);
+            if (weekMatch) months += parseFloat(weekMatch[1]) / 4.33; // Average weeks per month
+            if (dayMatch) months += parseFloat(dayMatch[1]) / 30.44; // Average days per month
+            
+            // If no matches, try to parse as just a number (assume months)
+            if (months === 0) {
+                const numberMatch = str.match(/(\d+(?:\.\d+)?)/);
+                if (numberMatch) {
+                    months = parseFloat(numberMatch[1]);
+                }
+            }
+            
+            return Math.max(months, 0.1); // Minimum 0.1 months
+        }
+        
+        function formatDuration(months) {
+            if (months < 1) {
+                const weeks = Math.round(months * 4.33);
+                const days = Math.round(months * 30.44);
+                if (weeks < 1) {
+                    return `${days} day${days !== 1 ? 's' : ''}`;
+                }
+                return `${weeks} week${weeks !== 1 ? 's' : ''}`;
+            }
+            
+            const years = Math.floor(months / 12);
+            const remainingMonths = Math.round(months % 12);
+            
+            if (years === 0) {
+                return `${Math.round(months)} month${Math.round(months) !== 1 ? 's' : ''}`;
+            } else if (remainingMonths === 0) {
+                return `${years} year${years !== 1 ? 's' : ''}`;
+            } else {
+                return `${years} year${years !== 1 ? 's' : ''} and ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
+            }
+        }
+        
+        function calculateMonthsNeeded(cost, monthlyAmount) {
+            return cost / monthlyAmount;
+        }
+        
+        function formatCurrency(amount) {
+            return `£${amount.toFixed(2)}`;
+        }
+        
+        function formatDate(monthsFromNow) {
+            const date = new Date();
+            date.setMonth(date.getMonth() + Math.ceil(monthsFromNow));
+            return date.toLocaleDateString('en-GB', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+        
+        function updateCalculations() {
+            const cost = parseFloat(document.getElementById('cost').value) || 350;
+            const durationInput = document.getElementById('duration').value || '6 months';
+            const monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 20;
+            
+            const monthsNeeded = calculateMonthsNeeded(cost, monthlyAmount);
+            const durationText = formatDuration(monthsNeeded);
+            const targetDate = formatDate(monthsNeeded);
+            
+            // Main result
+            const mainResult = `It'll take you ${durationText} to save enough money to buy this ${formatCurrency(cost)} item on ${targetDate}.`;
+            document.getElementById('mainResult').textContent = mainResult;
+            
+            // Scenarios
+            const scenarios = [
+                { label: '+50% more saving', multiplier: 1.5, class: 'positive-scenario' },
+                { label: '+25% more saving', multiplier: 1.25, class: 'positive-scenario' },
+                { label: '+10% more saving', multiplier: 1.1, class: 'positive-scenario' },
+                { label: '-10% less saving', multiplier: 0.9, class: 'negative-scenario' },
+                { label: '-25% less saving', multiplier: 0.75, class: 'negative-scenario' },
+                { label: '-50% less saving', multiplier: 0.5, class: 'negative-scenario' }
+            ];
+            
+            const scenariosHTML = scenarios.map(scenario => {
+                const adjustedAmount = monthlyAmount * scenario.multiplier;
+                const adjustedMonths = calculateMonthsNeeded(cost, adjustedAmount);
+                const adjustedDuration = formatDuration(adjustedMonths);
+                
+                return `
+                    <div class="scenario ${scenario.class}">
+                        <span class="scenario-label">${scenario.label} (${formatCurrency(adjustedAmount)}):</span>
+                        <span class="scenario-value">${adjustedDuration}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('scenarios').innerHTML = scenariosHTML;
+            
+            // Show results with animation
+            const resultsSection = document.getElementById('results');
+            resultsSection.classList.add('visible');
+        }
+        
+        // Event listeners
+        document.getElementById('cost').addEventListener('input', updateCalculations);
+        document.getElementById('duration').addEventListener('input', updateCalculations);
+        document.getElementById('monthlyAmount').addEventListener('input', updateCalculations);
+        
+        // Initial calculation
+        updateCalculations();
+        
+        // Add loading animation effect on input focus
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('input-loading', 'loading');
+                setTimeout(() => {
+                    this.parentElement.classList.remove('loading');
+                }, 500);
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('input-loading');
+            });
+        });
+    </script>
+</body>
+</html>
