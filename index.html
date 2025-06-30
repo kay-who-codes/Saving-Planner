@@ -432,16 +432,16 @@
             const discrepancy = totalSavedInDuration - cost;
             
             // Main result with additional info
-            let mainResult = `It'll take you ${durationText} to save enough money to buy this ${formatCurrency(cost)} item on ${targetDate}.\n\n`;
-            mainResult += `After your specified duration of ${formatDuration(userDurationMonths)}, you'll have saved ${formatCurrency(totalSavedInDuration)}. `;
+            let mainResult = `It'll take you <strong>${durationText}</strong> to save enough money to buy this <strong>${formatCurrency(cost)}</strong> item on <strong>${targetDate}</strong>.\n\n`;
+            mainResult += `After your specified duration of <strong>${formatDuration(userDurationMonths)}</strong>, you'll have saved <strong>${formatCurrency(totalSavedInDuration)}</strong>. `;
             
             if (discrepancy >= 0) {
-                mainResult += `That's ${formatCurrency(discrepancy)} more than you need - you could buy it earlier!`;
+                mainResult += `That's <strong>${formatCurrency(discrepancy)}</strong> more than you need - you could buy it earlier!`;
             } else {
-                mainResult += `You'll still need ${formatCurrency(Math.abs(discrepancy))} more to reach your goal.`;
+                mainResult += `You'll still need <strong>${formatCurrency(Math.abs(discrepancy))}</strong> more to reach your goal.`;
             }
             
-            document.getElementById('mainResult').textContent = mainResult;
+            document.getElementById('mainResult').innerHTML = mainResult;
             
             // Scenarios
             const scenarios = [
